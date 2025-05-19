@@ -11,61 +11,34 @@ class JournalEntryPage extends StatefulWidget {
 class _JournalEntryPageState extends State<JournalEntryPage> {
   final FirestoreService _firestoreService = FirestoreService();
   final TextEditingController _controller = TextEditingController();
-  bool _isLoading = true;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadExistingEntry();
-  }
-
-  Future<void> _loadExistingEntry() async {
-    String? existingEntry = await _firestoreService.getTodayJournalEntry();
-    setState(() {
-      _controller.text = existingEntry ?? '';
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _saveEntry() async {
-    if (_controller.text.trim().isNotEmpty) {
-      await _firestoreService.saveJournalEntry(_controller.text.trim());
-      if (!mounted) return;
-      Navigator.pop(context); // Return to Home Page after saving
+  void _saveEntry() async {
+    if (_controller.text.isNotEmpty) {
+      await _firestoreService.saveJournalEntry(_controller.text);
+      Navigator.pop(context); // Return to HomePage after saving
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Today's Journal")),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
+      appBar: AppBar(title: const Text('Write Journal Entry')),
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const Text(
-              'Write about your day:',
-              style: TextStyle(fontSize: 20),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: TextField(
-                controller: _controller,
-                maxLines: null,
-                expands: true,
-                keyboardType: TextInputType.multiline,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Start writing...',
-                ),
+            TextField(
+              controller: _controller,
+              maxLines: 10,
+              decoration: const InputDecoration(
+                hintText: 'How are you feeling today?',
+                border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _saveEntry,
-              child: const Text('Save Entry'),
+              child: const Text('Save Journal Entry'),
             ),
           ],
         ),

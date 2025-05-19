@@ -10,16 +10,12 @@ class MoodTrackerPage extends StatefulWidget {
 
 class _MoodTrackerPageState extends State<MoodTrackerPage> {
   final FirestoreService _firestoreService = FirestoreService();
-
-  // List of Emojis to Choose From
-  final List<String> _moods = ['😢', '😕', '😐', '🙂', '😊', '😁'];
-  String? _selectedMood;
+  String? selectedMood;
 
   void _saveMood() async {
-    if (_selectedMood != null) {
-      await _firestoreService.saveMood(_selectedMood!);
-      if (!mounted) return;
-      Navigator.pop(context); // Return to Home Page after saving
+    if (selectedMood != null) {
+      await _firestoreService.saveMood(selectedMood!);
+      Navigator.pop(context); // Return to HomePage after saving
     }
   }
 
@@ -27,48 +23,31 @@ class _MoodTrackerPageState extends State<MoodTrackerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Track Your Mood')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'How are you feeling today?',
-              style: TextStyle(fontSize: 20),
-            ),
-            const SizedBox(height: 32),
-
-            // Emoji Picker
+            const Text('Select Your Mood:'),
+            const SizedBox(height: 16),
             Wrap(
-              spacing: 20,
-              children: _moods.map((emoji) {
-                return GestureDetector(
-                  onTap: () {
+              spacing: 10,
+              children: ['😊', '😢', '😡', '😴', '😰'].map((mood) {
+                return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedMood == mood ? Colors.blue : null,
+                  ),
+                  onPressed: () {
                     setState(() {
-                      _selectedMood = emoji;
+                      selectedMood = mood;
                     });
                   },
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: _selectedMood == emoji ? Colors.blueAccent.withOpacity(0.2) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: _selectedMood == emoji ? Colors.blueAccent : Colors.grey,
-                        width: 2,
-                      ),
-                    ),
-                    child: Text(
-                      emoji,
-                      style: const TextStyle(fontSize: 40),
-                    ),
-                  ),
+                  child: Text(mood, style: const TextStyle(fontSize: 24)),
                 );
               }).toList(),
             ),
-
-            const SizedBox(height: 40),
+            const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _saveMood,
+              onPressed: selectedMood == null ? null : _saveMood,
               child: const Text('Save Mood'),
             ),
           ],

@@ -13,9 +13,7 @@ class FirestoreService {
   // Get Today's Date as String (e.g., 2025-05-19)
   String get todayDate => DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-  // ---------------------------
   // Save Mood for Today
-  // ---------------------------
   Future<void> saveMood(String moodEmoji) async {
     if (userId == null) return;
 
@@ -34,9 +32,7 @@ class FirestoreService {
     }
   }
 
-  // ---------------------------
   // Get Mood for Today
-  // ---------------------------
   Future<String?> getTodayMood() async {
     if (userId == null) return null;
 
@@ -57,9 +53,7 @@ class FirestoreService {
     }
   }
 
-  // ---------------------------
   // Save Journal Entry for Today
-  // ---------------------------
   Future<void> saveJournalEntry(String entryText) async {
     if (userId == null) return;
 
@@ -78,9 +72,7 @@ class FirestoreService {
     }
   }
 
-  // ---------------------------
   // Get Journal Entry for Today
-  // ---------------------------
   Future<String?> getTodayJournalEntry() async {
     if (userId == null) return null;
 
@@ -101,9 +93,7 @@ class FirestoreService {
     }
   }
 
-  // ---------------------------
   // Get All Past Journal Entries
-  // ---------------------------
   Stream<QuerySnapshot> getAllJournalEntries() {
     if (userId == null) {
       return const Stream.empty();
@@ -113,6 +103,20 @@ class FirestoreService {
         .collection('users')
         .doc(userId)
         .collection('journals')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
+
+  // Get All Past Mood Entries
+  Stream<QuerySnapshot> getAllMoodEntries() {
+    if (userId == null) {
+      return const Stream.empty();
+    }
+
+    return _db
+        .collection('users')
+        .doc(userId)
+        .collection('moods')
         .orderBy('timestamp', descending: true)
         .snapshots();
   }
