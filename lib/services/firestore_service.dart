@@ -48,7 +48,9 @@ class FirestoreService {
           .doc(todayDate)
           .get();
 
-      return doc.exists ? doc.data()?['mood'] as String? : null;
+      if (userId == null) {
+        return null;
+      }
     } catch (e) {
       print('Error fetching mood: $e');
       return null;
@@ -90,7 +92,9 @@ class FirestoreService {
           .doc(todayDate)
           .get();
 
-      return doc.exists ? doc.data()?['entry'] as String? : null;
+      if (userId == null) {
+        return null;
+      }
     } catch (e) {
       print('Error fetching journal entry: $e');
       return null;

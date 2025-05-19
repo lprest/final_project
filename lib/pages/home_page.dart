@@ -3,7 +3,7 @@ import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
 import 'journal_entry_page.dart';
 import 'mood_tracker_page.dart';
-import 'past_entries_page.dart'; // ✅ Import Past Entries Page
+import 'past_entries_page.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Text(
               "Today's Mood:",
-              style: Theme.of(context).textTheme.headlineSmall, // ✅ Updated
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
             _todayMood != null
@@ -77,8 +77,7 @@ class _HomePageState extends State<HomePage> {
                 await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const MoodTrackerPage()),
-                );
-                _loadTodayData();
+                ).then((_) => _loadTodayData());
               },
               child: const Text("Track Today's Mood"),
             ),
@@ -86,7 +85,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 32),
             Text(
               "Today's Journal:",
-              style: Theme.of(context).textTheme.headlineSmall, // ✅ Updated
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
             _todayJournal != null
@@ -99,8 +98,7 @@ class _HomePageState extends State<HomePage> {
                 await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const JournalEntryPage()),
-                );
-                _loadTodayData();
+                ).then((_) => _loadTodayData());
               },
               child: const Text("Write Today's Journal"),
             ),
@@ -112,7 +110,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const PastEntriesPage()),
-                  );
+                  ).then((_) => _loadTodayData());
                 },
                 child: const Text("View Past Entries"),
               ),

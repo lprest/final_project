@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'pages/splash_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project/pages/splash_page.dart';
+import 'firebase_options.dart';
 
-void main() async {
+Future<void> main() async {
+  // Initialize Flutter bindings and Firebase
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Initialize Firestore instance (optional if you’re using Firestore elsewhere)
+  FirebaseFirestore db = FirebaseFirestore.instance;
+
+  // Start the app
   runApp(const MyApp());
 }
 
