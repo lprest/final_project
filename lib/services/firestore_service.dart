@@ -13,7 +13,9 @@ class FirestoreService {
   // Get Today's Date as String (e.g., 2025-05-19)
   String get todayDate => DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-  // Save Mood for Today
+  // ---------------------------
+  // Save Mood Entry (allow multiple per day)
+  // ---------------------------
   Future<void> saveMood(String moodEmoji) async {
     if (userId == null) return;
 
@@ -22,8 +24,7 @@ class FirestoreService {
           .collection('users')
           .doc(userId)
           .collection('moods')
-          .doc(todayDate)
-          .set({
+          .add({
         'mood': moodEmoji,
         'timestamp': FieldValue.serverTimestamp(),
       });
@@ -32,28 +33,33 @@ class FirestoreService {
     }
   }
 
-  // Get Mood for Today
+  // ---------------------------
+  // Get Most Recent Mood Entry
+  // ---------------------------
   Future<String?> getTodayMood() async {
     if (userId == null) return null;
 
     try {
-      var doc = await _db
+      var snapshot = await _db
           .collection('users')
           .doc(userId)
           .collection('moods')
-          .doc(todayDate)
+          .orderBy('timestamp', descending: true)
+          .limit(1)
           .get();
 
-      if (userId == null) {
-        return null;
-      }
+      if (snapshot.docs.isEmpty) return null;
+
+      return snapshot.docs.first.data()['mood'] as String?;
     } catch (e) {
       print('Error fetching mood: $e');
       return null;
     }
   }
 
-  // Save Journal Entry for Today
+  // ---------------------------
+  // Save Journal Entry (allow multiple per day)
+  // ---------------------------
   Future<void> saveJournalEntry(String entryText) async {
     if (userId == null) return;
 
@@ -62,8 +68,7 @@ class FirestoreService {
           .collection('users')
           .doc(userId)
           .collection('journals')
-          .doc(todayDate)
-          .set({
+          .add({
         'entry': entryText,
         'timestamp': FieldValue.serverTimestamp(),
       });
@@ -72,28 +77,33 @@ class FirestoreService {
     }
   }
 
-  // Get Journal Entry for Today
+  // ---------------------------
+  // Get Most Recent Journal Entry
+  // ---------------------------
   Future<String?> getTodayJournalEntry() async {
     if (userId == null) return null;
 
     try {
-      var doc = await _db
+      var snapshot = await _db
           .collection('users')
           .doc(userId)
           .collection('journals')
-          .doc(todayDate)
+          .orderBy('timestamp', descending: true)
+          .limit(1)
           .get();
 
-      if (userId == null) {
-        return null;
-      }
+      if (snapshot.docs.isEmpty) return null;
+
+      return snapshot.docs.first.data()['entry'] as String?;
     } catch (e) {
       print('Error fetching journal entry: $e');
       return null;
     }
   }
 
+  // ---------------------------
   // Get All Past Journal Entries
+  // ---------------------------
   Stream<QuerySnapshot> getAllJournalEntries() {
     if (userId == null) {
       return const Stream.empty();
@@ -107,7 +117,9 @@ class FirestoreService {
         .snapshots();
   }
 
+  // ---------------------------
   // Get All Past Mood Entries
+  // ---------------------------
   Stream<QuerySnapshot> getAllMoodEntries() {
     if (userId == null) {
       return const Stream.empty();

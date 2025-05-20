@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import '../services/firestore_service.dart';
 
 class PastMoodsPage extends StatelessWidget {
   const PastMoodsPage({super.key});
+
+  String formatTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) return 'Unknown date';
+    final dt = timestamp.toDate();
+    return DateFormat('MMM dd, yyyy – hh:mm a').format(dt);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +36,17 @@ class PastMoodsPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final mood = moods[index];
               final data = mood.data() as Map<String, dynamic>;
-              final date = mood.id;
               final moodValue = data['mood'] ?? '';
+              final timestamp = data['timestamp'] as Timestamp?;
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
-                  title: Text(date, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(moodValue, style: const TextStyle(fontSize: 24)),
+                  title: Text(formatTimestamp(timestamp)),
+                  subtitle: Text(
+                    moodValue,
+                    style: const TextStyle(fontSize: 24),
+                  ),
                 ),
               );
             },
