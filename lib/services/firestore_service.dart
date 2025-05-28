@@ -7,15 +7,10 @@ class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Get Current User ID
   String? get userId => _auth.currentUser?.uid;
 
-  // Get Today's Date as String (e.g., 2025-05-19)
   String get todayDate => DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-  // ---------------------------
-  // Save Mood Entry (allow multiple per day)
-  // ---------------------------
   Future<void> saveMood(String moodEmoji) async {
     if (userId == null) return;
 
@@ -33,9 +28,6 @@ class FirestoreService {
     }
   }
 
-  // ---------------------------
-  // Get Most Recent Mood Entry
-  // ---------------------------
   Future<String?> getTodayMood() async {
     if (userId == null) return null;
 
@@ -57,9 +49,6 @@ class FirestoreService {
     }
   }
 
-  // ---------------------------
-  // Save Journal Entry (allow multiple per day)
-  // ---------------------------
   Future<void> saveJournalEntry(String entryText) async {
     if (userId == null) return;
 
@@ -77,9 +66,6 @@ class FirestoreService {
     }
   }
 
-  // ---------------------------
-  // Get Most Recent Journal Entry
-  // ---------------------------
   Future<String?> getTodayJournalEntry() async {
     if (userId == null) return null;
 
@@ -101,9 +87,6 @@ class FirestoreService {
     }
   }
 
-  // ---------------------------
-  // Get All Past Journal Entries
-  // ---------------------------
   Stream<QuerySnapshot> getAllJournalEntries() {
     if (userId == null) {
       return const Stream.empty();
@@ -117,9 +100,6 @@ class FirestoreService {
         .snapshots();
   }
 
-  // ---------------------------
-  // Get All Past Mood Entries
-  // ---------------------------
   Stream<QuerySnapshot> getAllMoodEntries() {
     if (userId == null) {
       return const Stream.empty();

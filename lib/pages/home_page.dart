@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
 import 'journal_entry_page.dart';
 import 'mood_tracker_page.dart';
 import 'past_entries_page.dart';
 import 'past_moods_page.dart';
-import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,8 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final AuthService _authService = AuthService();
-  final FirestoreService _firestoreService = FirestoreService();
+  final _firestoreService = FirestoreService();
 
   String? _todayMood;
   String? _todayJournal;
@@ -28,8 +25,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadTodayData() async {
-    String? mood = await _firestoreService.getTodayMood();
-    String? journal = await _firestoreService.getTodayJournalEntry();
+    final mood = await _firestoreService.getTodayMood();
+    final journal = await _firestoreService.getTodayJournalEntry();
 
     setState(() {
       _todayMood = mood;
@@ -37,95 +34,99 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _logout() async {
-    await _authService.signOut();
-    if (!mounted) return;
-    Navigator.pushReplacement(
+  Future<void> _navigateAndRefresh(Widget page) async {
+    await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
+      MaterialPageRoute(builder: (_) => page),
     );
+    await _loadTodayData();
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final baseFontSize = screenWidth * 0.045; // scales dynamically
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Mental Health Journal'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
-          ),
-        ],
+        backgroundColor: Theme.of(context).primaryColor,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: baseFontSize + 4,
+          fontWeight: FontWeight.w600,
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFE0C3FC), Color(0xFF8EC5FC)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        constraints: const BoxConstraints.expand(),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
               "Today's Mood:",
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: TextStyle(
+                fontSize: baseFontSize,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            const SizedBox(height: 8),
-            if (_todayMood != null)
-              Text(_todayMood!, style: const TextStyle(fontSize: 40)),
-            const SizedBox(height: 24),
+            Text(
+              _todayMood ?? 'No mood selected yet',
+              style: TextStyle(fontSize: baseFontSize + 20),
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MoodTrackerPage()),
-                    );
-                    await _loadTodayData();
-                  },
-                  child: const Text("Add Mood"),
+                  onPressed: () => _navigateAndRefresh(const MoodTrackerPage()),
+                  child: const Text('Add Mood'),
                 ),
+                const SizedBox(width: 20),
                 ElevatedButton(
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const PastMoodsPage()),
-                    );
-                    await _loadTodayData();
-                  },
-                  child: const Text("View Moods"),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PastMoodsPage()),
+                  ),
+                  child: const Text('View Moods'),
                 ),
               ],
             ),
-            const SizedBox(height: 32),
             Text(
               "Today's Journal:",
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: TextStyle(
+                fontSize: baseFontSize,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            const SizedBox(height: 8),
-            if (_todayJournal != null)
-              Text(_todayJournal!, style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 24),
+            Text(
+              _todayJournal ?? 'No journal entry yet',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: baseFontSize - 2),
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const JournalEntryPage()),
-                    );
-                    await _loadTodayData();
-                  },
-                  child: const Text("Add Journal"),
+                  onPressed: () =>
+                      _navigateAndRefresh(const JournalEntryPage()),
+                  child: const Text('Add Journal'),
                 ),
+                const SizedBox(width: 20),
                 ElevatedButton(
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const PastEntriesPage()),
-                    );
-                    await _loadTodayData();
-                  },
-                  child: const Text("View Journals"),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PastEntriesPage()),
+                  ),
+                  child: const Text('View Journals'),
                 ),
               ],
             ),
