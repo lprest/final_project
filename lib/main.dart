@@ -5,16 +5,13 @@ import 'package:final_project/pages/splash_page.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  // Initialize Flutter bindings and Firebase
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize Firestore instance (optional if you’re using Firestore elsewhere)
   FirebaseFirestore db = FirebaseFirestore.instance;
 
-  // Start the app
   runApp(const MyApp());
 }
 
@@ -28,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.yellow,
       ),
-      home: const SplashPage(), // Start with Splash Page
+      home: const SplashPage(), //Start with Splash Page
       debugShowCheckedModeBanner: false,
     );
   }
